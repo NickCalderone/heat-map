@@ -73,8 +73,7 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
     const yScale = d3.scaleBand()
  //       .domain(['December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January'])
         .domain([12,11,10,9,8,7,6,5,4,3,2,1])
-        .range([h - padding - rectHeight, padding]) 
-        console.log("test ",xScale(1990), yScale(3))
+        .range([h - padding, padding]) 
 
     svg.selectAll('rect')
         .data(response.monthlyVariance)
