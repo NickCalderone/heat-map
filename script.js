@@ -75,6 +75,13 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .domain([12,11,10,9,8,7,6,5,4,3,2,1])
         .range([h - padding, padding]) 
 
+    const colorDomain = d3.extent(response.monthlyVariance, d => d.variance + baseTemperature)
+    console.log(colorDomain)
+
+    const colorScale = d3.scaleLinear()
+        .domain([d3.min(response.monthlyVariance, d => d.variance + baseTemperature), d3.mean(response.monthlyVariance, d => d.variance + baseTemperature), d3.max(response.monthlyVariance, d => d.variance + baseTemperature)])
+        .range(['blue','#ffd885 ', 'red'])
+
     svg.selectAll('rect')
         .data(response.monthlyVariance)
         .enter()
@@ -83,7 +90,7 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .attr('height', yScale.bandwidth())
         .attr('x', d => xScale(d.year))
         .attr('y', d => yScale(d.month))
-        .attr('fill', 'navy')
+        .attr('fill', d => colorScale(d.variance + baseTemperature))
     
     console.log(yScale(1), yScale(12))
     console.log(xScale(1800))
