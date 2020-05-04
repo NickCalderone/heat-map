@@ -109,6 +109,11 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .attr('x', d => xScale(d.year))
         .attr('y', d => yScale(toMonth(d.month)))
         .attr('fill', d => colorScale(d.variance + baseTemperature))
+        .on('mouseover', function(d) {d3.select('#tooltip').style('opacity', 1).attr('data-year', d.year).text(`${toMonth(d.month)}, ${d.year} Temperature ${(d.variance + 8.66).toFixed(2)}`)})
+        .on('mouseout', function() {d3.select('#tooltip').style('opacity', 0)})
+        .on('mousemove', function() {
+            d3.select('#tooltip').style('left', (d3.event.pageX+10) + 'px').style('top', (d3.event.pageY) + 'px')
+        })
 
     const xAxis = d3.axisBottom(xScale)
         .tickValues(xScale.domain().filter(d => d % 5 == 0))
@@ -122,13 +127,29 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
     svg.append('g')
         .attr("transform", "translate(0," + (h - padding) + ")")
         .attr('id', 'x-axis')
-        .call(xAxis)
+        .call(xAxis)          .append('div')
+        .attr('id', 'tooltip')
+        .attr('style', 'opacity: 0')
+        .attr('style', 'position: absolute')
+        .attr('width', 500)
+        .attr('height', 500)
 
+         //added tooltip div
+    d3.select('body')
+        .append('div')
+        .attr('id', 'tooltip')
+        .attr('style', 'opacity: 0')
+        .attr('style', 'position: absolute')
+    
     const legendSvg = d3.select('body')
-    .append("svg")
-    .attr('width', 500)
-    .attr('height', 500)
-    .attr("class","legend")
+        .append('svg')
+        .attr('height', 1000)
+        .attr('height', 1000)
+        .attr('id', 'legend')
+
+    legendSvg.append('text')
+        .text('Temperature Range')
+        .attr('y', 20)
 
     legendSvg.selectAll('rect')
         .data(colors)
@@ -137,10 +158,26 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .attr('height', yScale.bandwidth())
         .attr('width', xScale.bandwidth())
         .attr('x', (d,i) => 20)
-        .attr('y', (d,i) => (yScale.bandwidth() + 10) * i)
+        .attr('y', (d,i) => yScale.bandwidth() * (i + 1))
         .attr('fill', d => d)
 
-    legendSvg.append('g')
-        .attr('transform', 'translate(200, 200)')
-        .call(colorScale.domain())
+    function legendText(data, length){
+        const simplified = data.map(x => x)
+        const difference = simplified[1] - simplified[0] 
+        const quantity = difference / length
+        const array = []
+        array.push()
+        for (let i = 0; i < length + 1; i++){
+            array.push((quantity * i + simplified[0]).toFixed(2))
+        }
+        return array
+    }
+
+    legendSvg.selectAll('text')
+        .data(legendText(colorScale.domain(), colors.length))
+        .enter()
+        .append('text')
+        .text(d => d)
+        .attr('x', 30)
+        .attr('y', (d,i) => (yScale.bandwidth() * (i + 1)) + 7.5)
 })
