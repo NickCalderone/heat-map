@@ -54,6 +54,20 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         }
     }
 
+    const titleDiv = d3.select('body')
+        .append('div')
+        .attr('id', 'titleDiv')
+        .append('h1')
+        .attr('id', 'title')
+        .text('Monthly Global Land-Surface Temperature')
+
+    const description = d3.select('#titleDiv')
+        .append('h2')
+        .attr('id', 'description')
+        .text('1753-2015, base temperature 8.66C')
+
+    d3.select()
+
     function onlyUnique(value, index, self) { 
     return self.indexOf(value) === index;
 }
@@ -71,12 +85,11 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .range([padding, w - padding])
 
     const yScale = d3.scaleBand()
- //       .domain(['December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January'])
-        .domain([12,11,10,9,8,7,6,5,4,3,2,1])
+        .domain(['December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January'])
+ //       .domain([12,11,10,9,8,7,6,5,4,3,2,1])
         .range([h - padding, padding]) 
 
     const colorDomain = d3.extent(response.monthlyVariance, d => d.variance + baseTemperature)
-    console.log(colorDomain)
 
     const colorScale = d3.scaleLinear()
         .domain([d3.min(response.monthlyVariance, d => d.variance + baseTemperature), d3.mean(response.monthlyVariance, d => d.variance + baseTemperature), d3.max(response.monthlyVariance, d => d.variance + baseTemperature)])
@@ -86,13 +99,35 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .data(response.monthlyVariance)
         .enter()
         .append('rect')
+        .attr('class', 'cell')
+        .attr('data-month', d => d.month - 1)
+        .attr('data-year', d => d.year)
+        .attr('data-temp', d => d.variance + 8.66)
         .attr('width', xScale.bandwidth())
         .attr('height', yScale.bandwidth())
         .attr('x', d => xScale(d.year))
-        .attr('y', d => yScale(d.month))
+        .attr('y', d => yScale(toMonth(d.month)))
         .attr('fill', d => colorScale(d.variance + baseTemperature))
+
+    const xAxis = d3.axisBottom(xScale)
+        .tickValues(xScale.domain().filter(d => d % 5 == 0))
+    const yAxis = d3.axisLeft(yScale)
+
+    svg.append('g')
+        .attr("transform", "translate(" + padding + ", 0)")
+        .attr('id', 'y-axis')
+        .call(yAxis)
+
+    svg.append('g')
+        .attr("transform", "translate(0," + (h - padding) + ")")
+        .attr('id', 'x-axis')
+        .call(xAxis)
     
-    console.log(yScale(1), yScale(12))
-    console.log(xScale(1800))
-    
+    const legend = d3.select('body')
+        .append('svg')
+        .attr('id', 'legend')
+        .attr('height', 200)
+        .attr('width', 600)
+
+    legend.append
 })
