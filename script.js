@@ -9,6 +9,7 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
     const baseTemperature = 8.66
     const rectWidth = (w - 2 * padding)/((response.monthlyVariance.length + 3) / 12)
     const rectHeight = (h - 2 * padding)/12
+    const colors = ['#0146a2','#2480fc','#7bedff','#b5fff1','#feee93','#ffd54d', '#ff8080', '#C70039', '#9a041d']
 
     function toMonth(num){
         switch(num){
@@ -93,7 +94,7 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
 
     const colorScale = d3.scaleQuantile()
         .domain([d3.min(response.monthlyVariance, d => d.variance + baseTemperature), d3.max(response.monthlyVariance, d => d.variance + baseTemperature)])
-        .range(['darkblue','blue','orange', 'red', 'darkred', 'red'])
+        .range(colors)
 
     svg.selectAll('rect')
         .data(response.monthlyVariance)
@@ -122,12 +123,24 @@ d3.json('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/mas
         .attr("transform", "translate(0," + (h - padding) + ")")
         .attr('id', 'x-axis')
         .call(xAxis)
-    
-    const legend = d3.select('body')
-        .append('svg')
-        .attr('id', 'legend')
-        .attr('height', 200)
-        .attr('width', 600)
 
-    legend.append
+    const legendSvg = d3.select('body')
+    .append("svg")
+    .attr('width', 500)
+    .attr('height', 500)
+    .attr("class","legend")
+
+    legendSvg.selectAll('rect')
+        .data(colors)
+        .enter()
+        .append('rect')
+        .attr('height', yScale.bandwidth())
+        .attr('width', xScale.bandwidth())
+        .attr('x', (d,i) => 20)
+        .attr('y', (d,i) => (yScale.bandwidth() + 10) * i)
+        .attr('fill', d => d)
+
+    legendSvg.append('g')
+        .attr('transform', 'translate(200, 200)')
+        .call(colorScale.domain())
 })
